@@ -1,0 +1,43 @@
+services:
+  database:
+    image: 'mariadb:10.10'
+    working_dir: /app
+    volumes:
+      - '.:/app'
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=tiendaOnline
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+    ports:
+      - '59003:3306'
+    networks:
+      - app-network
+
+  api:
+    build:
+      context: ./api
+    container_name: symfony_api
+    ports:
+      - "58000:58000"
+    networks:
+      - app-network
+    volumes:
+      - ./api:/var/www/symfony
+    depends_on:
+      - database
+
+  frontend:
+    build:
+      context: ./principal
+    container_name: react_frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    volumes:
+      - ./principal:/usr/src/app
+
+networks:
+  app-network:
+    driver: bridge
